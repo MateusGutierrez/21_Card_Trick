@@ -14,7 +14,7 @@ export const Body = () => {
         }
     },[count])
     return(
-        <StyledBody>
+        <StyledBody className="bodyContainer">
             {
                 Number(localStorage.getItem("@PLAY")) > 0 ?(
                 <section className="container">

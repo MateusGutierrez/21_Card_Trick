@@ -7,7 +7,7 @@ export const Header = () => {
     const {getDeckId,reStart} = useContext(CardContext)
     return(
         <>
-            <StyledHeader>
+            <StyledHeader className="headerContainer">
                     <h1 className="title">21 Card Trick</h1>
                     
                     <div className="div_buttons">

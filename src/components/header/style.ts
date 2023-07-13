@@ -28,8 +28,5 @@ export const StyledHeader = styled.div`
     .start_button:hover{
         background-color:  #D9D6B0;
     }
-/* 
-    @media(min-width: 500px){
-        height: 200px;
-    } */
+
 `

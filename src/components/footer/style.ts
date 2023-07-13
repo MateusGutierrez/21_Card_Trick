@@ -13,7 +13,5 @@ export const StyledFooter = styled.div`
     align-items: center;
     justify-content: center;
     
-    /* @media(min-width: 500px){
-        height: 200px;
-    } */
+
 `
