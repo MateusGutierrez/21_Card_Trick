@@ -12,4 +12,4 @@ Then the magician will repeat the deck building process a few times, shuffling t
 
 After the mixes, the magician will reveal the deck and, with a discerning eye, will be able to identify your card!
 
-To run the application: 
+To run the application: https://21-card-trick.vercel.app 
