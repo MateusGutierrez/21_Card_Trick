@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const StyledShowCard = styled.div`
-    height: 78vh;
+    height: 100vh;
     background-color:#182616;
     display: flex;
     align-items: center;
