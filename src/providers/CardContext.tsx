@@ -4,49 +4,54 @@ import { ICard } from "../interfaces/card.interfaces";
 import { useNavigate} from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css"
 import { toast } from "react-toastify";
+import { handleColumnId, useCountZustand, validatePlayZustand } from "../zustand";
 
-interface iCardContext{
+interface ICardContext{
     getDeckId: () => void;
-    count: number;
     firstColumn: ICard[] | [];
     secondColumn: ICard[] | [];
     thirdColumn: ICard[] | [];
     chooseColumn: React.MouseEventHandler<HTMLDivElement>;
     reStart: () => void;
 }
-interface iCardProps{
+interface ICardProps{
     children: React.ReactNode
 }
 
+export const CardContext = createContext({} as ICardContext)
 
-export const CardContext = createContext({} as iCardContext)
-
-export const CardProvider = ({children}: iCardProps) => {
-    const [count, setCount] = useState(0)
+export const CardProvider = ({children}: ICardProps) => {
     const [firstColumn, setFirstColumn] = useState<ICard[] | []>([])
     const [secondColumn, setSecondColumn] = useState<ICard[] | []>([])
     const [thirdColumn, setThirdColumn] = useState<ICard[] | []>([])
     const navigate = useNavigate()
 
+    const {
+        addCount,
+        contador,
+        reduceCountToOne, 
+      } = useCountZustand(({addCount, contador,reduceCountToOne}) => ({ addCount,contador,reduceCountToOne}));
+
+    const {
+        startGame,
+        endGame
+    } = validatePlayZustand(({startGame,endGame}) => ({startGame, endGame}))
+    const {
+        columnId,
+        chooseColumnId,
+        destroyColumnId,
+    } = handleColumnId(({columnId, chooseColumnId,destroyColumnId}) => ({columnId, chooseColumnId, destroyColumnId}))
 
     const getDeckId = async () => {
         const response = await api.get("api/deck/new/shuffle/?deck_count=1")
-        localStorage.setItem("@DECK_ID", response.data.deck_id)
-        localStorage.setItem("@PLAY", "1")
+        startGame()
         toast.success("Choose the column that contains your card!", {autoClose: 2000, position:"top-left"})
         setTimeout(() => {
-            getDeck()
+            getDeck(response.data.deck_id)
         }, 3000)
     }
-    const reStart = () => {
-        setCount(0)
-        localStorage.clear()
-        toast.success("Restarting the trick!", {autoClose:1500, position:"top-left"})
-        navigate("/")
-    }
-    const getDeck = async () => {
-        const deck_id: string | null = localStorage.getItem("@DECK_ID")
-        const response = await api.get(`api/deck/${deck_id}/draw/?count=21`)
+    const getDeck = async (id: string) => {
+        const response = await api.get(`api/deck/${id}/draw/?count=21`)
         setFirstColumn([...response.data.cards.slice(0, 7)])
         setSecondColumn([...response.data.cards.slice(7, 14)])
         setThirdColumn([...response.data.cards.slice(14, 21)])
@@ -54,16 +59,26 @@ export const CardProvider = ({children}: iCardProps) => {
     const chooseColumn: React.MouseEventHandler<HTMLDivElement> = (e) => {
         const target = e.currentTarget
         const id: string = target.id
+        chooseColumnId(Number(id))
         localStorage.setItem("@ColumnId", id)
-        if(count < 4){
-            setCount(count + 1)
+        if(contador < 4){
+            addCount()
         }
         toast.warning("Which column is your card in ?",  {autoClose: 3000, position:"top-left"})
         shuffleCards()
 
     }
+    const reStart = () => {
+        reduceCountToOne()
+        endGame()
+        destroyColumnId()
+        toast.success("Restarting the trick!", {autoClose:1500, position:"top-left"})
+        navigate("/")
+    }
     const shuffleCards = () => {
         const deck = []
+        const columnIdZustand = columnId
+        console.log(columnIdZustand)
         const id: number | null= Number(localStorage.getItem("@ColumnId"))
         if(id === 1){
             deck.push(...thirdColumn, ...firstColumn, ...secondColumn)
@@ -88,9 +103,7 @@ export const CardProvider = ({children}: iCardProps) => {
             secondColumn,
             thirdColumn,
             reStart,
-            count
         }}>
-
             {children}
         </CardContext.Provider>
     )

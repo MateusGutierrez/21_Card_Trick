@@ -4,19 +4,26 @@ import { CardContext } from "../../providers/CardContext"
 import { Card } from "../card"
 import { useNavigate } from "react-router-dom"
 import { ToastContainer } from "react-toastify"
+import { useCountZustand, validatePlayZustand } from "../../zustand"
 
 export const Body = () => {
-    const {count,chooseColumn,firstColumn,secondColumn,thirdColumn} = useContext(CardContext)
+    const {
+        chooseColumn,firstColumn,secondColumn,thirdColumn
+    } = useContext(CardContext)
+
+    const contador = useCountZustand((store) => store.contador);
+    const player = validatePlayZustand((store) => store.play)
+
     const navigate = useNavigate()
     useEffect(() => {
-        if(count === 3){
+        if(contador === 3){
             navigate("/show")
         }
-    },[count])
+    },[contador])
     return(
         <StyledBody className="bodyContainer">
             {
-                Number(localStorage.getItem("@PLAY")) > 0 ?(
+                Number(player) > 0 ?(
                 <section className="container">
                     <div className="j1" id="1" onClick={chooseColumn}> 
 
